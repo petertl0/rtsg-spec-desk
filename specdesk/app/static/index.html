@@ -84,6 +84,10 @@ select{background:var(--field);color:var(--ink);border:1px solid var(--line);bor
 .slate{margin-top:16px}.slate .s{font-size:12px;color:var(--mute)}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .sgrid label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mute)}
+.thumbwrap{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+#thumbVid{width:320px;max-width:100%;background:#000;border-radius:6px}
+.thumbctl{flex:1;min-width:240px}.thumbctl input[type=range]{width:100%;accent-color:var(--red)}
+.thumbctl input[type=number]{padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--field);color:var(--ink);font:inherit}
 .sgrid input{padding:9px 10px;background:var(--field);border:1px solid var(--line);border-radius:4px;color:var(--ink);font:inherit}
 @media(max-width:640px){header{padding:12px 16px}.go{margin-left:0;width:100%}}
 </style>
@@ -125,6 +129,21 @@ select{background:var(--field);color:var(--ink);border:1px solid var(--line);bor
           <label>Product<input id="sl_product" placeholder="Issue advocacy"></label>
           <label>Agency<input id="sl_agency" value="Right Target Strategy Group"></label>
           <label>Notes<input id="sl_notes" placeholder="Optional"></label>
+        </div>
+      </div>
+      <div class="group slate hidden" id="thumbBox">
+        <div class="gh"><h3>MMS first frame</h3><span class="s">This frame is what people see in the text thread before they tap play</span></div>
+        <div class="thumbwrap">
+          <video id="thumbVid" muted playsinline preload="auto"></video>
+          <div class="thumbctl">
+            <input type="range" id="thumbRange" min="0" max="0" step="0.0667" value="0">
+            <div class="row" style="margin-top:8px">
+              <label>Frame at <input type="number" id="thumbTime" min="0" step="0.0667" value="0" style="width:90px"> s</label>
+              <button class="ghost" type="button" id="thumbPrev">◀ Frame</button>
+              <button class="ghost" type="button" id="thumbNext">Frame ▶</button>
+            </div>
+            <p class="s" id="thumbMsg"></p>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -208,7 +227,30 @@ function updMedia() {
   $('#mediaGo').disabled = !(mediaFile && selected().length);
   const slated = new Set(P.video.filter(p => p.slate).map(p => p.id));
   $('#slateBox').classList.toggle('hidden', !selected().some(id => slated.has(id)));
+  const mmsIds = new Set(P.video.filter(p => p.mms).map(p => p.id));
+  $('#thumbBox').classList.toggle('hidden', !(mediaFile && selected().some(id => mmsIds.has(id))));
 }
+let thumbURL = null;
+function loadThumb(file) {
+  if (thumbURL) URL.revokeObjectURL(thumbURL);
+  thumbURL = file ? URL.createObjectURL(file) : null;
+  const v = $('#thumbVid'); $('#thumbMsg').textContent = '';
+  setThumb(0);
+  if (!thumbURL) { v.removeAttribute('src'); return; }
+  v.src = thumbURL;
+}
+function setThumb(t) {
+  const v = $('#thumbVid'), max = parseFloat($('#thumbRange').max) || 0;
+  t = Math.max(0, Math.min(isFinite(t) ? t : 0, max || t));
+  $('#thumbRange').value = t; $('#thumbTime').value = t.toFixed(2);
+  if (v.readyState >= 1) v.currentTime = t;
+}
+$('#thumbVid').onloadedmetadata = () => { const d = $('#thumbVid').duration; $('#thumbRange').max = Math.max(0, d - 0.05); setThumb(0); };
+$('#thumbVid').onerror = () => { $('#thumbMsg').textContent = "Your browser can't preview this file's codec (ProRes, for example). Type the time of the frame you want instead."; };
+$('#thumbRange').oninput = e => setThumb(parseFloat(e.target.value));
+$('#thumbTime').onchange = e => setThumb(parseFloat(e.target.value));
+$('#thumbPrev').onclick = () => setThumb(parseFloat($('#thumbTime').value) - 1 / 15);
+$('#thumbNext').onclick = () => setThumb(parseFloat($('#thumbTime').value) + 1 / 15);
 function slateFields() {
   const o = {}; ['adid', 'title', 'advertiser', 'product', 'agency', 'notes'].forEach(k => { const v = $('#sl_' + k).value.trim(); if (v) o[k] = v; });
   return JSON.stringify(o);
@@ -229,7 +271,7 @@ function dropzone(zone, input, onFiles) {
   zone.ondragleave = () => zone.classList.remove('over');
   zone.ondrop = e => { e.preventDefault(); zone.classList.remove('over'); onFiles([...e.dataTransfer.files]); };
 }
-dropzone($('#mediaDrop'), $('#mediaFile'), f => { mediaFile = f[0]; $('#mediaName').textContent = mediaFile ? `${mediaFile.name} · ${(mediaFile.size / 1048576).toFixed(1)} MB` : ''; updMedia(); });
+dropzone($('#mediaDrop'), $('#mediaFile'), f => { mediaFile = f[0]; loadThumb(mediaFile && /^video\//.test(mediaFile.type) || /\.(mp4|mov|m4v|webm|mxf|mkv)$/i.test(mediaFile?.name || '') ? mediaFile : null); $('#mediaName').textContent = mediaFile ? `${mediaFile.name} · ${(mediaFile.size / 1048576).toFixed(1)} MB` : ''; updMedia(); });
 dropzone($('#dispDrop'), $('#dispFile'), f => { dispFiles = f; $('#dispName').textContent = f.length ? `${f.length} file${f.length > 1 ? 's' : ''} selected` : ''; $('#dispGo').disabled = !f.length; });
 
 function upload(url, form, bar, btn) {
@@ -246,7 +288,7 @@ function upload(url, form, bar, btn) {
 }
 $('#mediaGo').onclick = async () => {
   const f = new FormData(); f.append('file', mediaFile); f.append('presets', selected().join(','));
-  f.append('fit', $('#fit').value); f.append('conform', $('#conform').checked ? '1' : '0'); f.append('slate', slateFields());
+  f.append('fit', $('#fit').value); f.append('conform', $('#conform').checked ? '1' : '0'); f.append('slate', slateFields()); f.append('thumb_time', $('#thumbTime').value || '0');
   try { const j = await upload('/api/jobs/media', f, $('#mediaBar'), $('#mediaGo')); open.add(j.id); refresh(); }
   catch (e) { alertInline(e.message); }
 };
