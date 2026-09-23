@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: rtsg-spec-desk
+    runtime: docker
+    dockerfilePath: ./specdesk/Dockerfile
+    dockerContext: ./specdesk
+    plan: standard
+    healthCheckPath: /healthz
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: TEAM_USERS
+        sync: false
+      - key: RETENTION_MINUTES
+        value: "60"
+      - key: MAX_UPLOAD_MB
+        value: "4096"
+      - key: X264_PRESET
+        value: medium
+    disk:
+      name: work
+      mountPath: /tmp/specdesk
+      sizeGB: 50
