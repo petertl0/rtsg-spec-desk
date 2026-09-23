@@ -2,80 +2,258 @@
   "_notes": "Edit these values to match current platform documentation. 'verify' = value is common industry practice but should be confirmed against the platform's current spec sheet. Loudness 'enforce': true makes a loudness miss a FAIL; false makes it a WARNING.",
   "video": [
     {
+      "id": "er_broadcast_1080",
+      "group": "Broadcast TV",
+      "name": "Extreme Reach — Broadcast 1080p",
+      "container": "mov",
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1920,
+      "height": 1080,
+      "fps_allowed": [
+        23.976
+      ],
+      "rate_control": "cbr",
+      "bitrate_mbps": 20,
+      "min_mbps": 18,
+      "max_mbps": 22,
+      "gop_seconds": 1,
+      "acodec": "pcm_s24le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "loudness": {
+        "target_lufs": -24,
+        "tolerance": 2,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        10,
+        15,
+        30,
+        60,
+        120
+      ],
+      "duration_tolerance": 0.05,
+      "slate": {
+        "slate_seconds": 8,
+        "black_seconds": 2,
+        "tail_black_seconds": 0,
+        "start_timecode": "00:59:50:00"
+      },
+      "max_file_mb": 10240,
+      "verify": [
+        "slate/black timing and start timecode (00:59:50:00 slate, 01:00:00:00 program)",
+        "container/audio codec (MOV + 24-bit PCM)",
+        "tail black requirement"
+      ]
+    },
+    {
       "id": "roku_ctv",
       "group": "CTV / OTT",
       "name": "Roku CTV (H.264 mezzanine)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1920, "height": 1080,
-      "fps_allowed": [23.976, 24, 25, 29.97, 30],
-      "rate_control": "cbr", "bitrate_mbps": 20, "min_mbps": 15, "max_mbps": 30,
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1920,
+      "height": 1080,
+      "fps_allowed": [
+        23.976,
+        24,
+        25,
+        29.97,
+        30
+      ],
+      "rate_control": "cbr",
+      "bitrate_mbps": 20,
+      "min_mbps": 15,
+      "max_mbps": 30,
       "gop_seconds": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 256, "min_audio_kbps": 192,
-      "loudness": {"target_lufs": -24, "tolerance": 2, "max_tp": -2, "enforce": true},
-      "durations": [6, 15, 30, 60], "duration_tolerance": 0.5,
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 256,
+      "min_audio_kbps": 192,
+      "loudness": {
+        "target_lufs": -24,
+        "tolerance": 2,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        6,
+        15,
+        30,
+        60
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 1024,
-      "verify": ["max_file_mb", "bitrate range"]
+      "verify": [
+        "max_file_mb",
+        "bitrate range"
+      ]
     },
     {
       "id": "disney_prores",
       "group": "CTV / OTT",
       "name": "Hulu / Disney+ (ProRes 422 HQ)",
       "container": "mov",
-      "vcodec": "prores", "profile": "hq",
-      "width": 1920, "height": 1080,
-      "fps_allowed": [23.976, 29.97],
-      "acodec": "pcm_s24le", "sample_rate": 48000, "channels": 2,
-      "loudness": {"target_lufs": -24, "tolerance": 2, "max_tp": -2, "enforce": true},
-      "durations": [15, 30, 45, 60, 90], "duration_tolerance": 0.5,
+      "vcodec": "prores",
+      "profile": "hq",
+      "width": 1920,
+      "height": 1080,
+      "fps_allowed": [
+        23.976,
+        29.97
+      ],
+      "acodec": "pcm_s24le",
+      "sample_rate": 48000,
+      "channels": 2,
+      "loudness": {
+        "target_lufs": -24,
+        "tolerance": 2,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        15,
+        30,
+        45,
+        60,
+        90
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 10240,
-      "verify": ["durations", "max_file_mb"]
+      "verify": [
+        "durations",
+        "max_file_mb"
+      ]
     },
     {
       "id": "disney_h264",
       "group": "CTV / OTT",
       "name": "Hulu / Disney+ (H.264)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1920, "height": 1080,
-      "fps_allowed": [23.976, 29.97],
-      "rate_control": "cbr", "bitrate_mbps": 20, "min_mbps": 15, "max_mbps": 30,
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1920,
+      "height": 1080,
+      "fps_allowed": [
+        23.976,
+        29.97
+      ],
+      "rate_control": "cbr",
+      "bitrate_mbps": 20,
+      "min_mbps": 15,
+      "max_mbps": 30,
       "gop_seconds": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 256, "min_audio_kbps": 192,
-      "loudness": {"target_lufs": -24, "tolerance": 2, "max_tp": -2, "enforce": true},
-      "durations": [15, 30, 45, 60, 90], "duration_tolerance": 0.5,
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 256,
+      "min_audio_kbps": 192,
+      "loudness": {
+        "target_lufs": -24,
+        "tolerance": 2,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        15,
+        30,
+        45,
+        60,
+        90
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 10240,
-      "verify": ["min_mbps (older Hulu docs cite 10)"]
+      "verify": [
+        "min_mbps (older Hulu docs cite 10)"
+      ]
     },
     {
       "id": "vast_mezz",
       "group": "CTV / OTT",
       "name": "VAST / DSP mezzanine 1080p",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1920, "height": 1080,
-      "fps_allowed": [23.976, 24, 25, 29.97, 30],
-      "rate_control": "cbr", "bitrate_mbps": 20, "min_mbps": 15, "max_mbps": 30,
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1920,
+      "height": 1080,
+      "fps_allowed": [
+        23.976,
+        24,
+        25,
+        29.97,
+        30
+      ],
+      "rate_control": "cbr",
+      "bitrate_mbps": 20,
+      "min_mbps": 15,
+      "max_mbps": 30,
       "gop_seconds": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 192, "min_audio_kbps": 192,
-      "loudness": {"target_lufs": -24, "tolerance": 2, "max_tp": -2, "enforce": true},
-      "durations": [6, 15, 30, 60], "duration_tolerance": 0.5,
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 192,
+      "min_audio_kbps": 192,
+      "loudness": {
+        "target_lufs": -24,
+        "tolerance": 2,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        6,
+        15,
+        30,
+        60
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 1024,
-      "verify": ["max_file_mb (varies by DSP)"]
+      "verify": [
+        "max_file_mb (varies by DSP)"
+      ]
     },
     {
       "id": "vast_720",
       "group": "CTV / OTT",
       "name": "VAST streaming rendition 720p",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1280, "height": 720,
-      "fps_allowed": [23.976, 24, 25, 29.97, 30],
-      "rate_control": "vbr", "bitrate_mbps": 4, "min_mbps": 2, "max_mbps": 8,
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1280,
+      "height": 720,
+      "fps_allowed": [
+        23.976,
+        24,
+        25,
+        29.97,
+        30
+      ],
+      "rate_control": "vbr",
+      "bitrate_mbps": 4,
+      "min_mbps": 2,
+      "max_mbps": 8,
       "gop_seconds": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 192, "min_audio_kbps": 128,
-      "loudness": {"target_lufs": -24, "tolerance": 2, "max_tp": -2, "enforce": true},
-      "durations": [6, 15, 30, 60], "duration_tolerance": 0.5,
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 192,
+      "min_audio_kbps": 128,
+      "loudness": {
+        "target_lufs": -24,
+        "tolerance": 2,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        6,
+        15,
+        30,
+        60
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 1024
     },
     {
@@ -83,13 +261,29 @@
       "group": "Social / Digital",
       "name": "Meta Feed 4:5 (1080x1350)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1080, "height": 1350,
-      "fps_range": [23, 60], "fps_default": 30,
-      "rate_control": "vbr", "bitrate_mbps": 10,
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1080,
+      "height": 1350,
+      "fps_range": [
+        23,
+        60
+      ],
+      "fps_default": 30,
+      "rate_control": "vbr",
+      "bitrate_mbps": 10,
       "gop_seconds": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 192, "min_audio_kbps": 128,
-      "loudness": {"target_lufs": -14, "tolerance": 2, "max_tp": -1, "enforce": false},
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 192,
+      "min_audio_kbps": 128,
+      "loudness": {
+        "target_lufs": -14,
+        "tolerance": 2,
+        "max_tp": -1,
+        "enforce": false
+      },
       "max_duration": 14460,
       "max_file_mb": 4096
     },
@@ -98,13 +292,29 @@
       "group": "Social / Digital",
       "name": "Meta Feed 1:1 (1080x1080)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1080, "height": 1080,
-      "fps_range": [23, 60], "fps_default": 30,
-      "rate_control": "vbr", "bitrate_mbps": 8,
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1080,
+      "height": 1080,
+      "fps_range": [
+        23,
+        60
+      ],
+      "fps_default": 30,
+      "rate_control": "vbr",
+      "bitrate_mbps": 8,
       "gop_seconds": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 192, "min_audio_kbps": 128,
-      "loudness": {"target_lufs": -14, "tolerance": 2, "max_tp": -1, "enforce": false},
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 192,
+      "min_audio_kbps": 128,
+      "loudness": {
+        "target_lufs": -14,
+        "tolerance": 2,
+        "max_tp": -1,
+        "enforce": false
+      },
       "max_duration": 14460,
       "max_file_mb": 4096
     },
@@ -113,29 +323,65 @@
       "group": "Social / Digital",
       "name": "Meta Reels / Stories 9:16 (1080x1920)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1080, "height": 1920,
-      "fps_range": [23, 60], "fps_default": 30,
-      "rate_control": "vbr", "bitrate_mbps": 12,
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1080,
+      "height": 1920,
+      "fps_range": [
+        23,
+        60
+      ],
+      "fps_default": 30,
+      "rate_control": "vbr",
+      "bitrate_mbps": 12,
       "gop_seconds": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 192, "min_audio_kbps": 128,
-      "loudness": {"target_lufs": -14, "tolerance": 2, "max_tp": -1, "enforce": false},
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 192,
+      "min_audio_kbps": 128,
+      "loudness": {
+        "target_lufs": -14,
+        "tolerance": 2,
+        "max_tp": -1,
+        "enforce": false
+      },
       "max_duration": 900,
       "max_file_mb": 4096,
-      "verify": ["max_duration (Reels ads; Stories cards are 60s)"]
+      "verify": [
+        "max_duration (Reels ads; Stories cards are 60s)"
+      ]
     },
     {
       "id": "youtube_16x9",
       "group": "Social / Digital",
       "name": "YouTube 16:9 (1920x1080)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1920, "height": 1080,
-      "fps_range": [24, 60], "fps_default": 30,
-      "rate_control": "vbr", "bitrate_mbps": 8, "bitrate_mbps_high_fps": 12,
-      "gop_seconds": 0.5, "bframes": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 384, "min_audio_kbps": 128,
-      "loudness": {"target_lufs": -14, "tolerance": 2, "max_tp": -1, "enforce": false},
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1920,
+      "height": 1080,
+      "fps_range": [
+        24,
+        60
+      ],
+      "fps_default": 30,
+      "rate_control": "vbr",
+      "bitrate_mbps": 8,
+      "bitrate_mbps_high_fps": 12,
+      "gop_seconds": 0.5,
+      "bframes": 2,
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 384,
+      "min_audio_kbps": 128,
+      "loudness": {
+        "target_lufs": -14,
+        "tolerance": 2,
+        "max_tp": -1,
+        "enforce": false
+      },
       "max_file_mb": 262144
     },
     {
@@ -143,13 +389,31 @@
       "group": "Social / Digital",
       "name": "YouTube Shorts 9:16 (1080x1920)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1080, "height": 1920,
-      "fps_range": [24, 60], "fps_default": 30,
-      "rate_control": "vbr", "bitrate_mbps": 8, "bitrate_mbps_high_fps": 12,
-      "gop_seconds": 0.5, "bframes": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 384, "min_audio_kbps": 128,
-      "loudness": {"target_lufs": -14, "tolerance": 2, "max_tp": -1, "enforce": false},
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1080,
+      "height": 1920,
+      "fps_range": [
+        24,
+        60
+      ],
+      "fps_default": 30,
+      "rate_control": "vbr",
+      "bitrate_mbps": 8,
+      "bitrate_mbps_high_fps": 12,
+      "gop_seconds": 0.5,
+      "bframes": 2,
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 384,
+      "min_audio_kbps": 128,
+      "loudness": {
+        "target_lufs": -14,
+        "tolerance": 2,
+        "max_tp": -1,
+        "enforce": false
+      },
       "max_duration": 60,
       "max_file_mb": 262144
     },
@@ -158,13 +422,31 @@
       "group": "Social / Digital",
       "name": "YouTube 1:1 (1080x1080)",
       "container": "mp4",
-      "vcodec": "h264", "profile": "high",
-      "width": 1080, "height": 1080,
-      "fps_range": [24, 60], "fps_default": 30,
-      "rate_control": "vbr", "bitrate_mbps": 8, "bitrate_mbps_high_fps": 12,
-      "gop_seconds": 0.5, "bframes": 2,
-      "acodec": "aac", "sample_rate": 48000, "channels": 2, "audio_kbps": 384, "min_audio_kbps": 128,
-      "loudness": {"target_lufs": -14, "tolerance": 2, "max_tp": -1, "enforce": false},
+      "vcodec": "h264",
+      "profile": "high",
+      "width": 1080,
+      "height": 1080,
+      "fps_range": [
+        24,
+        60
+      ],
+      "fps_default": 30,
+      "rate_control": "vbr",
+      "bitrate_mbps": 8,
+      "bitrate_mbps_high_fps": 12,
+      "gop_seconds": 0.5,
+      "bframes": 2,
+      "acodec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "audio_kbps": 384,
+      "min_audio_kbps": 128,
+      "loudness": {
+        "target_lufs": -14,
+        "tolerance": 2,
+        "max_tp": -1,
+        "enforce": false
+      },
       "max_file_mb": 262144
     }
   ],
@@ -173,43 +455,113 @@
       "id": "spotify",
       "group": "Streaming Audio",
       "name": "Spotify",
-      "formats": ["mp3"],
-      "mp3_kbps": 320, "min_mp3_kbps": 192,
-      "sample_rate": 44100, "channels": 2,
-      "loudness": {"target_lufs": -16, "tolerance": 1, "max_tp": -2, "enforce": true},
-      "durations": [15, 30, 60], "duration_tolerance": 0.5,
+      "formats": [
+        "mp3"
+      ],
+      "mp3_kbps": 320,
+      "min_mp3_kbps": 192,
+      "sample_rate": 44100,
+      "channels": 2,
+      "loudness": {
+        "target_lufs": -16,
+        "tolerance": 1,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        15,
+        30,
+        60
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 1024,
-      "verify": ["target_lufs (some Spotify docs cite -14)"]
+      "verify": [
+        "target_lufs (some Spotify docs cite -14)"
+      ]
     },
     {
       "id": "pandora",
       "group": "Streaming Audio",
       "name": "Pandora / SiriusXM Media",
-      "formats": ["mp3", "wav"],
-      "mp3_kbps": 320, "min_mp3_kbps": 192, "wav_bits": 16,
-      "sample_rate": 44100, "channels": 2,
-      "loudness": {"target_lufs": -16, "tolerance": 1, "max_tp": -2, "enforce": true},
-      "durations": [15, 30], "duration_tolerance": 0.5,
+      "formats": [
+        "mp3",
+        "wav"
+      ],
+      "mp3_kbps": 320,
+      "min_mp3_kbps": 192,
+      "wav_bits": 16,
+      "sample_rate": 44100,
+      "channels": 2,
+      "loudness": {
+        "target_lufs": -16,
+        "tolerance": 1,
+        "max_tp": -2,
+        "enforce": true
+      },
+      "durations": [
+        15,
+        30
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 10,
-      "verify": ["target_lufs", "max_file_mb (WAV at 30s is ~5 MB)"]
+      "verify": [
+        "target_lufs",
+        "max_file_mb (WAV at 30s is ~5 MB)"
+      ]
     },
     {
       "id": "iheart",
       "group": "Streaming Audio",
       "name": "iHeartMedia",
-      "formats": ["wav", "mp3"],
-      "mp3_kbps": 320, "min_mp3_kbps": 192, "wav_bits": 16,
-      "sample_rate": 44100, "channels": 2,
-      "loudness": {"target_lufs": -16, "tolerance": 1, "max_tp": -1, "enforce": true},
-      "durations": [15, 30, 60], "duration_tolerance": 0.5,
+      "formats": [
+        "wav",
+        "mp3"
+      ],
+      "mp3_kbps": 320,
+      "min_mp3_kbps": 192,
+      "wav_bits": 16,
+      "sample_rate": 44100,
+      "channels": 2,
+      "loudness": {
+        "target_lufs": -16,
+        "tolerance": 1,
+        "max_tp": -1,
+        "enforce": true
+      },
+      "durations": [
+        15,
+        30,
+        60
+      ],
+      "duration_tolerance": 0.5,
       "max_file_mb": 100,
-      "verify": ["target_lufs", "max_file_mb"]
+      "verify": [
+        "target_lufs",
+        "max_file_mb"
+      ]
     }
   ],
   "display": {
-    "sizes": ["300x250", "728x90", "160x600", "300x600", "320x50", "970x250", "300x50", "320x100", "336x280", "468x60", "120x600", "970x90"],
+    "sizes": [
+      "300x250",
+      "728x90",
+      "160x600",
+      "300x600",
+      "320x50",
+      "970x250",
+      "300x50",
+      "320x100",
+      "336x280",
+      "468x60",
+      "120x600",
+      "970x90"
+    ],
     "max_kb": 150,
-    "formats": ["jpg", "png", "gif"],
+    "formats": [
+      "jpg",
+      "png",
+      "gif"
+    ],
     "max_animation_seconds": 30,
     "max_loops": 3,
     "max_batch": 200
