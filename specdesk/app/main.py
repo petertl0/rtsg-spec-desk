@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import broadcast, display, media
+from . import broadcast, display, media, mms
 
 BASE = Path(__file__).parent
 DATA = Path(os.environ.get("DATA_DIR", "/tmp/specdesk"))
@@ -106,7 +106,7 @@ def presets(request: Request):
     s = load_specs()
     out = {"video": [], "audio": [], "display": s["display"]}
     for p in s["video"]:
-        out["video"].append({"id": p["id"], "group": p["group"], "name": p["name"], "summary": summarize(p), "verify": p.get("verify", []), "slate": bool(p.get("slate"))})
+        out["video"].append({"id": p["id"], "group": p["group"], "name": p["name"], "summary": summarize(p), "verify": p.get("verify", []), "slate": bool(p.get("slate")), "mms": bool(p.get("mms"))})
     for p in s["audio"]:
         out["audio"].append({"id": p["id"], "group": p["group"], "name": p["name"], "summary": summarize(p), "verify": p.get("verify", [])})
     out["retention_minutes"] = RETENTION_MIN
@@ -116,6 +116,9 @@ def presets(request: Request):
 def summarize(p):
     L = p.get("loudness", {})
     loud = f"{L.get('target_lufs')} LUFS / {L.get('max_tp')} dBTP" if L else ""
+    if p.get("mms"):
+        m = p["mms"]
+        return f"auto-sized to fit · H.264 Baseline · mono AAC · ≤ {m['max_kb']} KB · you pick the first frame"
     if "width" in p:
         v = "ProRes 422 HQ" if p["vcodec"] == "prores" else f"H.264 {p['bitrate_mbps']} Mbps"
         extra = " · slate-ready" if p.get("slate") else ""
@@ -168,7 +171,8 @@ def safe_name(n):
 
 @app.post("/api/jobs/media")
 async def create_media_job(request: Request, file: UploadFile = File(...), presets: str = Form(...),
-                           fit: str = Form("pad"), conform: str = Form("1"), slate: str = Form("{}")):
+                           fit: str = Form("pad"), conform: str = Form("1"), slate: str = Form("{}"),
+                           thumb_time: float = Form(0.0)):
     user = require(request)
     ids = [p for p in presets.split(",") if p]
     if not ids:
@@ -183,7 +187,8 @@ async def create_media_job(request: Request, file: UploadFile = File(...), prese
         slate_fields = {k: str(v)[:80] for k, v in json.loads(slate or "{}").items() if k in SLATE_KEYS}
     except ValueError:
         slate_fields = {}
-    job = new_job(user, "media", [name], {"presets": ids, "fit": fit, "conform": conform == "1", "slate": slate_fields})
+    job = new_job(user, "media", [name], {"presets": ids, "fit": fit, "conform": conform == "1", "slate": slate_fields,
+                                             "thumb_time": max(0.0, thumb_time)})
     try:
         await save_upload(file, job_dir(job["id"]) / "in" / name)
     except Exception:
@@ -335,7 +340,12 @@ def process_media(job):
             if kind == "video":
                 if not info["video"]:
                     raise media.MediaError("Source has no video; video presets need a video master")
-                if p.get("slate"):
+                if p.get("mms"):
+                    fname = f"{stem}_{p['id']}.mp4"
+                    entry["notes"], dims, tt = mms.encode_mms(src, info, p, out / fname, job["options"].get("thumb_time", 0), job_dir(job["id"]))
+                    job["step"] = f"Verifying {label}"
+                    checks, oinfo, loud = mms.qc_mms(out / fname, p, src, tt, dims)
+                elif p.get("slate"):
                     sf = job["options"].get("slate") or {}
                     adid = broadcast.clean_adid(sf.get("adid"))
                     fname = f"{adid or stem + '_' + p['id']}.{p['container']}"
