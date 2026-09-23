@@ -81,6 +81,10 @@ select{background:var(--field);color:var(--ink);border:1px solid var(--line);bor
 .errtxt{color:var(--fail);white-space:pre-wrap;font-size:12px}
 .empty{color:var(--mute);font-size:14px}
 .stat{display:flex;gap:14px;font-size:13px;margin-top:6px}
+.slate{margin-top:16px}.slate .s{font-size:12px;color:var(--mute)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.sgrid label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mute)}
+.sgrid input{padding:9px 10px;background:var(--field);border:1px solid var(--line);border-radius:4px;color:var(--ink);font:inherit}
 @media(max-width:640px){header{padding:12px 16px}.go{margin-left:0;width:100%}}
 </style>
 </head>
@@ -112,6 +116,17 @@ select{background:var(--field);color:var(--ink);border:1px solid var(--line);bor
       <div class="drop" id="mediaDrop"><b>Drop master file</b>MOV, MP4, MXF, WAV, AIFF, MP3 — video masters can also feed audio outputs
         <div class="fname" id="mediaName"></div><input type="file" id="mediaFile" hidden></div>
       <div class="grid" id="presetGrid"></div>
+      <div class="group slate hidden" id="slateBox">
+        <div class="gh"><h3>Broadcast slate</h3><span class="s">Shown for 8s before the spot · file is named by Ad-ID</span></div>
+        <div class="sgrid">
+          <label>Ad-ID / ISCI<input id="sl_adid" placeholder="ABCD1234000H" maxlength="16"></label>
+          <label>Spot title<input id="sl_title" placeholder="Protect Our Water"></label>
+          <label>Advertiser<input id="sl_advertiser" placeholder="Committee / client name"></label>
+          <label>Product<input id="sl_product" placeholder="Issue advocacy"></label>
+          <label>Agency<input id="sl_agency" value="Right Target Strategy Group"></label>
+          <label>Notes<input id="sl_notes" placeholder="Optional"></label>
+        </div>
+      </div>
       <div class="row">
         <label>Aspect fit
           <select id="fit"><option value="pad">Letterbox / pillarbox</option><option value="crop">Center crop</option><option value="blur">Blur fill</option></select></label>
@@ -189,7 +204,15 @@ function renderPresets() {
   document.querySelectorAll('#presetGrid input').forEach(x => x.onchange = updMedia);
 }
 function selected() { return [...document.querySelectorAll('#presetGrid input:checked')].map(x => x.value); }
-function updMedia() { $('#mediaGo').disabled = !(mediaFile && selected().length); }
+function updMedia() {
+  $('#mediaGo').disabled = !(mediaFile && selected().length);
+  const slated = new Set(P.video.filter(p => p.slate).map(p => p.id));
+  $('#slateBox').classList.toggle('hidden', !selected().some(id => slated.has(id)));
+}
+function slateFields() {
+  const o = {}; ['adid', 'title', 'advertiser', 'product', 'agency', 'notes'].forEach(k => { const v = $('#sl_' + k).value.trim(); if (v) o[k] = v; });
+  return JSON.stringify(o);
+}
 
 function renderSizes() {
   $('#maxBatch').textContent = P.display.max_batch;
@@ -223,7 +246,7 @@ function upload(url, form, bar, btn) {
 }
 $('#mediaGo').onclick = async () => {
   const f = new FormData(); f.append('file', mediaFile); f.append('presets', selected().join(','));
-  f.append('fit', $('#fit').value); f.append('conform', $('#conform').checked ? '1' : '0');
+  f.append('fit', $('#fit').value); f.append('conform', $('#conform').checked ? '1' : '0'); f.append('slate', slateFields());
   try { const j = await upload('/api/jobs/media', f, $('#mediaBar'), $('#mediaGo')); open.add(j.id); refresh(); }
   catch (e) { alertInline(e.message); }
 };
