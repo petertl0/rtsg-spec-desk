@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RTSG Spec Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0f12;--panel:#15181d;--line:#262a31;--ink:#eef0f3;--mute:#8b929c;--red:#d7263d;--red2:#a51c2f;--pass:#2fb36b;--warn:#e0a526;--fail:#e5484d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Barlow,system-ui,sans-serif}
+h1,h2,h3,.cond{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.03em;margin:0}
+a{color:inherit}
+button{font:600 14px 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:0;border-radius:4px;padding:10px 18px;background:var(--red);color:#fff}
+button:hover{background:var(--red2)} button:disabled{opacity:.45;cursor:not-allowed}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)} button.ghost:hover{border-color:var(--mute)}
+input[type=email],input[type=password]{width:100%;padding:11px 12px;background:#0b0d10;border:1px solid var(--line);border-radius:4px;color:var(--ink);font:inherit}
+.hidden{display:none!important}
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:28px;width:100%;max-width:380px}
+.card h1{font-size:30px}.card h1 b{color:var(--red)}
+.card p{color:var(--mute);margin:6px 0 20px}
+.card label{display:block;font-size:13px;color:var(--mute);margin:12px 0 5px}
+.card button{width:100%;margin-top:18px}
+.err{color:var(--fail);font-size:14px;margin-top:10px;min-height:1em}
+/* app */
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,15,18,.95);backdrop-filter:blur(6px);z-index:5}
+header h1{font-size:22px}header h1 b{color:var(--red)}
+.who{display:flex;gap:12px;align-items:center;color:var(--mute);font-size:14px}
+.who button{padding:6px 12px}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 80px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tab{background:none;color:var(--mute);border-radius:0;border-bottom:3px solid transparent;padding:10px 16px;font-size:16px}
+.tab:hover{background:none;color:var(--ink)} .tab.on{color:var(--ink);border-bottom-color:var(--red)}
+.drop{border:2px dashed var(--line);border-radius:8px;padding:30px 16px;text-align:center;color:var(--mute);cursor:pointer;transition:.15s}
+.drop.over,.drop:hover{border-color:var(--red);color:var(--ink)}
+.drop b{color:var(--ink);display:block;font:600 20px 'Barlow Condensed','Arial Narrow',sans-serif;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.drop .fname{color:var(--ink);margin-top:8px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:20px}
+.group{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.group .gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.group h3{font-size:16px;color:var(--red)}
+.group .all{font-size:12px;color:var(--mute);cursor:pointer;background:none;padding:0;text-transform:none;letter-spacing:0;font-family:Barlow}
+.opt{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
+.opt:first-of-type{border-top:0}
+.opt input{accent-color:var(--red);margin-top:3px}
+.opt .n{font-weight:600}.opt .s{font-size:12px;color:var(--mute)}
+.row{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:18px}
+.row label{display:flex;gap:6px;align-items:center;color:var(--mute);font-size:14px}
+select{background:#0b0d10;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:8px}
+.go{margin-left:auto}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--red);width:0;transition:width .3s}
+.sizes{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sizes label{border:1px solid var(--line);border-radius:4px;padding:5px 10px;font-size:13px;color:var(--ink);cursor:pointer}
+.sizes input{accent-color:var(--red)}
+/* jobs */
+#jobs h2{font-size:20px;margin:36px 0 12px}
+.job{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:14px}
+.jh{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.jh .t{font-weight:600;word-break:break-all}.jh .m{font-size:13px;color:var(--mute)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}.acts a,.acts button{font-size:13px;padding:7px 12px;text-decoration:none}
+.acts a{font:600 13px 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:4px}
+.acts a.pri{background:var(--red);border-color:var(--red)}
+.outs{margin-top:12px}
+.out{border-top:1px solid var(--line);padding:9px 0}
+.oh{display:flex;gap:10px;align-items:center;cursor:pointer}
+.oh .nm{flex:1;min-width:0}.oh .nm small{display:block;color:var(--mute);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font:700 11px 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:.08em;padding:3px 8px;border-radius:3px;color:#0d0f12;flex:none}
+.badge.pass{background:var(--pass)}.badge.warn{background:var(--warn)}.badge.fail,.badge.error{background:var(--fail);color:#fff}.badge.running{background:var(--line);color:var(--ink)}
+.dl{font-size:13px;color:var(--mute);text-decoration:underline;flex:none}
+.detail{margin:8px 0 4px 0;font-size:13px;overflow-x:auto}
+.detail table{width:100%;border-collapse:collapse;min-width:460px}
+.detail td,.detail th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left}
+.detail th{color:var(--mute);font-weight:500}
+.detail .r{text-align:right;font-weight:700}.pass .r{color:var(--pass)}.warn .r{color:var(--warn)}.fail .r{color:var(--fail)}.info .r{color:var(--mute)}
+.notes{color:var(--mute);margin:4px 0 6px;padding-left:18px}
+.verify{color:var(--warn);font-size:12px}
+.errtxt{color:var(--fail);white-space:pre-wrap;font-size:12px}
+.empty{color:var(--mute);font-size:14px}
+.stat{display:flex;gap:14px;font-size:13px;margin-top:6px}
+@media(max-width:640px){header{padding:12px 16px}.go{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+
+<section id="login" class="hidden">
+  <form class="card" id="loginForm">
+    <h1>Spec <b>Desk</b></h1>
+    <p>RTSG creative transcoding &amp; QC</p>
+    <label for="em">Email</label><input id="em" type="email" autocomplete="username" required>
+    <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required>
+    <button type="submit">Sign in</button>
+    <div class="err" id="loginErr"></div>
+  </form>
+</section>
+
+<section id="app" class="hidden">
+  <header>
+    <h1>Spec <b>Desk</b></h1>
+    <div class="who"><span id="who"></span><button class="ghost" id="logout">Sign out</button></div>
+  </header>
+  <main>
+    <div class="tabs">
+      <button class="tab on" data-tab="media">Video &amp; Audio</button>
+      <button class="tab" data-tab="display">Display</button>
+    </div>
+
+    <div id="tab-media">
+      <div class="drop" id="mediaDrop"><b>Drop master file</b>MOV, MP4, MXF, WAV, AIFF, MP3 — video masters can also feed audio outputs
+        <div class="fname" id="mediaName"></div><input type="file" id="mediaFile" hidden></div>
+      <div class="grid" id="presetGrid"></div>
+      <div class="row">
+        <label>Aspect fit
+          <select id="fit"><option value="pad">Letterbox / pillarbox</option><option value="crop">Center crop</option><option value="blur">Blur fill</option></select></label>
+        <label><input type="checkbox" id="conform" checked> Conform to exact spot length (±1s)</label>
+        <button class="go" id="mediaGo" disabled>Encode &amp; verify</button>
+      </div>
+      <div class="bar hidden" id="mediaBar"><i></i></div>
+    </div>
+
+    <div id="tab-display" class="hidden">
+      <div class="drop" id="dispDrop"><b>Drop banners</b>JPG, PNG, GIF or a ZIP · up to <span id="maxBatch">200</span> files
+        <div class="fname" id="dispName"></div><input type="file" id="dispFile" multiple accept=".jpg,.jpeg,.png,.gif,.zip" hidden></div>
+      <div class="row">
+        <label><input type="radio" name="dmode" value="optimize" checked> QC &amp; optimize existing banners</label>
+        <label><input type="radio" name="dmode" value="resize"> Generate sizes from a master image</label>
+      </div>
+      <div id="sizeWrap" class="hidden"><div class="sizes" id="sizes"></div></div>
+      <div class="row"><span class="empty" id="dispRule"></span><button class="go" id="dispGo" disabled>Process banners</button></div>
+      <div class="bar hidden" id="dispBar"><i></i></div>
+    </div>
+
+    <div id="jobs"><h2>Jobs</h2><div id="jobList"><p class="empty">No jobs yet.</p></div></div>
+  </main>
+</section>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let P = null, mediaFile = null, dispFiles = [], open = new Set(), poll = null;
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, {credentials: 'same-origin', ...opts});
+  if (r.status === 401) { showLogin(); throw new Error('auth'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.detail || r.statusText);
+  return j;
+}
+
+function showLogin() { $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); }
+async function boot() {
+  const me = await fetch('/api/me').then(r => r.json());
+  if (!me.user) return showLogin();
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  $('#who').textContent = me.user;
+  P = await api('/api/presets');
+  renderPresets(); renderSizes(); refresh();
+}
+
+$('#loginForm').onsubmit = async e => {
+  e.preventDefault(); $('#loginErr').textContent = '';
+  const r = await fetch('/api/login', {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email: $('#em').value, password: $('#pw').value})});
+  if (!r.ok) { $('#loginErr').textContent = (await r.json()).detail || 'Sign-in failed'; return; }
+  boot();
+};
+$('#logout').onclick = async () => { await fetch('/api/logout', {method: 'POST'}); location.reload(); };
+
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+  $('#tab-media').classList.toggle('hidden', t.dataset.tab !== 'media');
+  $('#tab-display').classList.toggle('hidden', t.dataset.tab !== 'display');
+});
+
+function renderPresets() {
+  const groups = {};
+  [...P.video, ...P.audio].forEach(p => (groups[p.group] ||= []).push(p));
+  $('#presetGrid').innerHTML = Object.entries(groups).map(([g, list]) => `
+    <div class="group"><div class="gh"><h3>${esc(g)}</h3><button class="all" data-g="${esc(g)}">Select all</button></div>
+    ${list.map(p => `<label class="opt"><input type="checkbox" value="${p.id}" data-g="${esc(g)}">
+      <span><span class="n">${esc(p.name)}</span><br><span class="s">${esc(p.summary)}</span></span></label>`).join('')}</div>`).join('');
+  document.querySelectorAll('.all').forEach(b => b.onclick = () => {
+    const boxes = [...document.querySelectorAll(`#presetGrid input[data-g="${b.dataset.g}"]`)];
+    const on = !boxes.every(x => x.checked); boxes.forEach(x => x.checked = on); updMedia();
+  });
+  document.querySelectorAll('#presetGrid input').forEach(x => x.onchange = updMedia);
+}
+function selected() { return [...document.querySelectorAll('#presetGrid input:checked')].map(x => x.value); }
+function updMedia() { $('#mediaGo').disabled = !(mediaFile && selected().length); }
+
+function renderSizes() {
+  $('#maxBatch').textContent = P.display.max_batch;
+  $('#dispRule').textContent = `Limit ${P.display.max_kb} KB · ${P.display.formats.join('/').toUpperCase()}`;
+  $('#sizes').innerHTML = P.display.sizes.map(s => `<label><input type="checkbox" value="${s}" checked> ${s}</label>`).join('');
+}
+document.querySelectorAll('input[name=dmode]').forEach(r => r.onchange = () =>
+  $('#sizeWrap').classList.toggle('hidden', document.querySelector('input[name=dmode]:checked').value !== 'resize'));
+
+function dropzone(zone, input, onFiles) {
+  zone.onclick = () => input.click();
+  input.onchange = () => onFiles([...input.files]);
+  zone.ondragover = e => { e.preventDefault(); zone.classList.add('over'); };
+  zone.ondragleave = () => zone.classList.remove('over');
+  zone.ondrop = e => { e.preventDefault(); zone.classList.remove('over'); onFiles([...e.dataTransfer.files]); };
+}
+dropzone($('#mediaDrop'), $('#mediaFile'), f => { mediaFile = f[0]; $('#mediaName').textContent = mediaFile ? `${mediaFile.name} · ${(mediaFile.size / 1048576).toFixed(1)} MB` : ''; updMedia(); });
+dropzone($('#dispDrop'), $('#dispFile'), f => { dispFiles = f; $('#dispName').textContent = f.length ? `${f.length} file${f.length > 1 ? 's' : ''} selected` : ''; $('#dispGo').disabled = !f.length; });
+
+function upload(url, form, bar, btn) {
+  return new Promise((res, rej) => {
+    const x = new XMLHttpRequest(); x.open('POST', url);
+    bar.classList.remove('hidden'); btn.disabled = true;
+    x.upload.onprogress = e => { if (e.lengthComputable) bar.firstElementChild.style.width = (100 * e.loaded / e.total) + '%'; };
+    x.onload = () => { bar.classList.add('hidden'); bar.firstElementChild.style.width = 0; btn.disabled = false;
+      let j = {}; try { j = JSON.parse(x.responseText); } catch {}
+      x.status < 300 ? res(j) : rej(new Error(j.detail || 'Upload failed')); };
+    x.onerror = () => { bar.classList.add('hidden'); btn.disabled = false; rej(new Error('Network error')); };
+    x.send(form);
+  });
+}
+$('#mediaGo').onclick = async () => {
+  const f = new FormData(); f.append('file', mediaFile); f.append('presets', selected().join(','));
+  f.append('fit', $('#fit').value); f.append('conform', $('#conform').checked ? '1' : '0');
+  try { const j = await upload('/api/jobs/media', f, $('#mediaBar'), $('#mediaGo')); open.add(j.id); refresh(); }
+  catch (e) { alertInline(e.message); }
+};
+$('#dispGo').onclick = async () => {
+  const f = new FormData(); dispFiles.forEach(x => f.append('files', x));
+  const mode = document.querySelector('input[name=dmode]:checked').value; f.append('mode', mode);
+  f.append('sizes', [...document.querySelectorAll('#sizes input:checked')].map(x => x.value).join(','));
+  try { const j = await upload('/api/jobs/display', f, $('#dispBar'), $('#dispGo')); open.add(j.id); refresh(); }
+  catch (e) { alertInline(e.message); }
+};
+function alertInline(m) { const d = document.createElement('p'); d.className = 'errtxt'; d.textContent = m; $('#jobList').prepend(d); setTimeout(() => d.remove(), 8000); }
+
+async function refresh() {
+  let jobs; try { jobs = await api('/api/jobs'); } catch { return; }
+  $('#jobList').innerHTML = jobs.length ? jobs.map(renderJob).join('') : '<p class="empty">No jobs yet.</p>';
+  document.querySelectorAll('.oh').forEach(h => h.onclick = e => { if (e.target.closest('a')) return;
+    const k = h.dataset.k; open.has(k) ? open.delete(k) : open.add(k); h.nextElementSibling.classList.toggle('hidden'); });
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { await api('/api/jobs/' + b.dataset.del, {method: 'DELETE'}); refresh(); });
+  clearTimeout(poll);
+  poll = setTimeout(refresh, jobs.some(j => j.status === 'queued' || j.status === 'processing') ? 2000 : 30000);
+}
+
+function renderJob(j) {
+  const cnt = {pass: 0, warn: 0, fail: 0, error: 0}; j.outputs.forEach(o => cnt[o.status] = (cnt[o.status] || 0) + 1);
+  const busy = j.status === 'queued' || j.status === 'processing';
+  const mins = j.expires ? Math.max(0, Math.round((j.expires * 1000 - Date.now()) / 60000)) : null;
+  const src = j.sources.length > 1 ? `${j.sources.length} banners` : j.sources[0];
+  return `<div class="job">
+    <div class="jh"><div><div class="t">${esc(src)}</div>
+      <div class="m">${esc(j.user)} · ${new Date(j.created * 1000).toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}
+      · ${busy ? esc(j.step) : j.status === 'error' ? 'Failed' : `Complete${mins !== null ? ` · files delete in ${mins} min` : ''}`}</div>
+      ${!busy && j.outputs.length ? `<div class="stat"><span style="color:var(--pass)">${cnt.pass} pass</span><span style="color:var(--warn)">${cnt.warn} warning</span><span style="color:var(--fail)">${cnt.fail + cnt.error} fail</span></div>` : ''}</div>
+      <div class="acts">${!busy && j.outputs.some(o => o.file) ? `<a class="pri" href="/api/jobs/${j.id}/zip">Download all</a><a href="/api/jobs/${j.id}/report" target="_blank">QC report</a>` : ''}
+        ${!busy ? `<button class="ghost" data-del="${j.id}">Delete now</button>` : ''}</div></div>
+    ${busy ? `<div class="bar"><i style="width:${Math.max(4, j.progress)}%"></i></div>` : ''}
+    ${j.error ? `<p class="errtxt">${esc(j.error)}</p>` : ''}
+    <div class="outs">${j.outputs.map((o, i) => renderOut(j, o, i)).join('')}</div></div>`;
+}
+function renderOut(j, o, i) {
+  const k = j.id + ':' + i;
+  const size = o.bytes ? (o.bytes > 1048576 ? (o.bytes / 1048576).toFixed(1) + ' MB' : Math.round(o.bytes / 1024) + ' KB') : '';
+  return `<div class="out"><div class="oh" data-k="${k}"><span class="badge ${o.status}">${o.status === 'running' ? '…' : o.status.toUpperCase()}</span>
+    <div class="nm">${esc(o.name)}<small>${esc(o.file || '')}${size ? ' · ' + size : ''}</small></div>
+    ${o.file ? `<a class="dl" href="/api/jobs/${j.id}/files/${encodeURIComponent(o.file)}">Download</a>` : ''}</div>
+    <div class="detail ${open.has(k) ? '' : 'hidden'}">
+      ${o.notes?.length ? `<ul class="notes">${o.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+      ${o.error ? `<div class="errtxt">${esc(o.error)}</div>` : ''}
+      ${o.checks?.length ? `<table><tr><th>Check</th><th>Spec</th><th>Measured</th><th></th></tr>${o.checks.map(c =>
+        `<tr class="${c.result}"><td>${esc(c.check)}</td><td>${esc(c.expected)}</td><td>${esc(c.measured)}</td><td class="r">${c.result.toUpperCase()}</td></tr>`).join('')}</table>` : ''}
+      ${o.verify?.length ? `<p class="verify">Confirm with platform: ${esc(o.verify.join(', '))}</p>` : ''}
+    </div></div>`;
+}
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: rtsg-spec-desk
+    runtime: docker
+    plan: standard        # 2 GB RAM / 1 CPU; use "pro" for faster encodes
+    healthCheckPath: /healthz
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: TEAM_USERS
+        sync: false       # set in dashboard: email:password,email:password
+      - key: RETENTION_MINUTES
+        value: "60"
+      - key: MAX_UPLOAD_MB
+        value: "4096"
+      - key: X264_PRESET
+        value: medium
+    disk:
+      name: work
+      mountPath: /tmp/specdesk
+      sizeGB: 50
