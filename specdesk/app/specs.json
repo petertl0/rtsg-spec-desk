@@ -448,6 +448,50 @@
         "enforce": false
       },
       "max_file_mb": 262144
+    },
+    {
+      "id": "mms_750",
+      "group": "SMS / MMS",
+      "name": "MMS / Texting — under 750 KB",
+      "container": "mp4",
+      "vcodec": "h264",
+      "profile": "baseline",
+      "mms": {
+        "max_kb": 750,
+        "safety": 0.96,
+        "fps": 15,
+        "audio_kbps": 32,
+        "overhead_kbps": 4,
+        "min_video_kbps": 40,
+        "size_ladder": [
+          {
+            "min_kbps": 450,
+            "width": 640
+          },
+          {
+            "min_kbps": 250,
+            "width": 480
+          },
+          {
+            "min_kbps": 120,
+            "width": 320
+          },
+          {
+            "min_kbps": 0,
+            "width": 240
+          }
+        ]
+      },
+      "loudness": {
+        "target_lufs": -16,
+        "tolerance": 2,
+        "max_tp": -1.5,
+        "enforce": false
+      },
+      "verify": [
+        "750 KB cap (some carriers allow 1 MB+, some less)",
+        "loudness target (-16 LUFS, warning only)"
+      ]
     }
   ],
   "audio": [
