@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import display, media
+from . import broadcast, display, media
 
 BASE = Path(__file__).parent
 DATA = Path(os.environ.get("DATA_DIR", "/tmp/specdesk"))
@@ -34,6 +34,7 @@ SECRET = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 VIDEO_EXT = {".mp4", ".mov", ".mxf", ".m4v", ".avi", ".mkv", ".webm", ".mpg", ".mpeg", ".ts"}
 AUDIO_EXT = {".wav", ".mp3", ".aif", ".aiff", ".m4a", ".aac", ".flac", ".ogg"}
 IMAGE_EXT = {".jpg", ".jpeg", ".png", ".gif"}
+SLATE_KEYS = {"adid", "title", "advertiser", "product", "agency", "notes"}
 
 
 def load_users():
@@ -105,7 +106,7 @@ def presets(request: Request):
     s = load_specs()
     out = {"video": [], "audio": [], "display": s["display"]}
     for p in s["video"]:
-        out["video"].append({"id": p["id"], "group": p["group"], "name": p["name"], "summary": summarize(p), "verify": p.get("verify", [])})
+        out["video"].append({"id": p["id"], "group": p["group"], "name": p["name"], "summary": summarize(p), "verify": p.get("verify", []), "slate": bool(p.get("slate"))})
     for p in s["audio"]:
         out["audio"].append({"id": p["id"], "group": p["group"], "name": p["name"], "summary": summarize(p), "verify": p.get("verify", [])})
     out["retention_minutes"] = RETENTION_MIN
@@ -117,7 +118,8 @@ def summarize(p):
     loud = f"{L.get('target_lufs')} LUFS / {L.get('max_tp')} dBTP" if L else ""
     if "width" in p:
         v = "ProRes 422 HQ" if p["vcodec"] == "prores" else f"H.264 {p['bitrate_mbps']} Mbps"
-        return f"{p['width']}x{p['height']} · {v} · {p['container'].upper()} · {loud}"
+        extra = " · slate-ready" if p.get("slate") else ""
+        return f"{p['width']}x{p['height']} · {v} · {p['container'].upper()} · {loud}{extra}"
     return f"{'/'.join(f.upper() for f in p['formats'])} · {p['sample_rate'] / 1000:g} kHz · {loud}"
 
 
@@ -166,7 +168,7 @@ def safe_name(n):
 
 @app.post("/api/jobs/media")
 async def create_media_job(request: Request, file: UploadFile = File(...), presets: str = Form(...),
-                           fit: str = Form("pad"), conform: str = Form("1")):
+                           fit: str = Form("pad"), conform: str = Form("1"), slate: str = Form("{}")):
     user = require(request)
     ids = [p for p in presets.split(",") if p]
     if not ids:
@@ -177,7 +179,11 @@ async def create_media_job(request: Request, file: UploadFile = File(...), prese
         raise HTTPException(400, f"Unsupported file type {ext}")
     if fit not in ("pad", "crop", "blur"):
         fit = "pad"
-    job = new_job(user, "media", [name], {"presets": ids, "fit": fit, "conform": conform == "1"})
+    try:
+        slate_fields = {k: str(v)[:80] for k, v in json.loads(slate or "{}").items() if k in SLATE_KEYS}
+    except ValueError:
+        slate_fields = {}
+    job = new_job(user, "media", [name], {"presets": ids, "fit": fit, "conform": conform == "1", "slate": slate_fields})
     try:
         await save_upload(file, job_dir(job["id"]) / "in" / name)
     except Exception:
@@ -329,10 +335,18 @@ def process_media(job):
             if kind == "video":
                 if not info["video"]:
                     raise media.MediaError("Source has no video; video presets need a video master")
-                fname = f"{stem}_{p['id']}.{p['container']}"
-                entry["notes"] = media.encode_video(src, info, p, out / fname, job["options"]["fit"], job["options"]["conform"])
-                job["step"] = f"Verifying {label}"
-                checks, oinfo, loud = media.qc_video(out / fname, p)
+                if p.get("slate"):
+                    sf = job["options"].get("slate") or {}
+                    adid = broadcast.clean_adid(sf.get("adid"))
+                    fname = f"{adid or stem + '_' + p['id']}.{p['container']}"
+                    entry["notes"], _ = broadcast.encode_broadcast(src, info, p, out / fname, sf, job["options"]["fit"], job["options"]["conform"])
+                    job["step"] = f"Verifying {label}"
+                    checks, oinfo, loud = broadcast.qc_broadcast(out / fname, p, sf)
+                else:
+                    fname = f"{stem}_{p['id']}.{p['container']}"
+                    entry["notes"] = media.encode_video(src, info, p, out / fname, job["options"]["fit"], job["options"]["conform"])
+                    job["step"] = f"Verifying {label}"
+                    checks, oinfo, loud = media.qc_video(out / fname, p)
             else:
                 fname = f"{stem}_{p['id']}.{fmt}"
                 entry["notes"] = media.encode_audio(src, info, p, fmt, out / fname, job["options"]["conform"])
